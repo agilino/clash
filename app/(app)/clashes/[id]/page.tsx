@@ -18,6 +18,9 @@ import { UserAvatar } from "@/components/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { JoinLeaveControl } from "@/components/clashes/join-leave-control";
+import { RequestActions } from "@/components/clashes/request-actions";
 import { DeleteClashButton } from "@/components/clashes/delete-clash-button";
 
 export async function generateMetadata({
@@ -69,6 +72,15 @@ export default async function ClashDetailPage({
   if (!clash) notFound();
 
   const isCreator = clash.creatorId === user.id;
+  const myParticipation = clash.participations.find(
+    (p) => p.userId === user.id,
+  );
+  const myStatus = (myParticipation?.status ?? "none") as
+    | "none"
+    | "pending"
+    | "accepted"
+    | "rejected";
+
   const past = isPastDate(clash.dateTime);
   const goingCount = clash.accepted.length + 1; // + host
 
@@ -130,7 +142,9 @@ export default async function ClashDetailPage({
               </Button>
               <DeleteClashButton clashId={clash.id} title={clash.title} />
             </>
-          ) : null}
+          ) : (
+            !past && <JoinLeaveControl clashId={clash.id} status={myStatus} />
+          )}
         </div>
       </div>
 
@@ -152,16 +166,50 @@ export default async function ClashDetailPage({
               <CardTitle>People</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="divide-y">
-                <PersonRow user={clash.creator} meta="Host" />
-                {clash.accepted.map((p) => (
-                  <PersonRow
-                    key={p.id}
-                    user={p.user}
-                    meta={`Joined ${formatRelative(p.createdAt)}`}
-                  />
-                ))}
-              </ul>
+              <Tabs defaultValue="going">
+                <TabsList>
+                  <TabsTrigger value="going">Going ({goingCount})</TabsTrigger>
+                  {isCreator && (
+                    <TabsTrigger value="requests">
+                      Requests ({clash.pending.length})
+                    </TabsTrigger>
+                  )}
+                </TabsList>
+
+                <TabsContent value="going">
+                  <ul className="divide-y">
+                    <PersonRow user={clash.creator} meta="Host" />
+                    {clash.accepted.map((p) => (
+                      <PersonRow
+                        key={p.id}
+                        user={p.user}
+                        meta={`Joined ${formatRelative(p.createdAt)}`}
+                      />
+                    ))}
+                  </ul>
+                </TabsContent>
+
+                {isCreator && (
+                  <TabsContent value="requests">
+                    {clash.pending.length === 0 ? (
+                      <p className="py-6 text-center text-sm text-muted-foreground">
+                        No pending requests right now.
+                      </p>
+                    ) : (
+                      <ul className="divide-y">
+                        {clash.pending.map((p) => (
+                          <PersonRow
+                            key={p.id}
+                            user={p.user}
+                            meta={`Requested ${formatRelative(p.createdAt)}`}
+                            action={<RequestActions participationId={p.id} />}
+                          />
+                        ))}
+                      </ul>
+                    )}
+                  </TabsContent>
+                )}
+              </Tabs>
             </CardContent>
           </Card>
         </div>
