@@ -1,0 +1,74 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(app/actions/**)",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/typecheck-actions.sh",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(npm run build*)",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/build-summary.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(prisma/migrations/**)",
+            "command": "echo 'Denied: prisma/migrations/* is generated. Run npm run db:migrate instead of hand-editing.' >&2; exit 2",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Read(.env*)",
+            "command": "echo 'Denied: .env holds SESSION_SECRET. Ask for the variable names instead of reading the file.' >&2; exit 2",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(rm *)",
+            "command": "echo 'Denied: rm is blocked in this workshop sandbox. Ask the trainer if you genuinely need it.' >&2; exit 2",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/build-gate.sh",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
+  }
+}
