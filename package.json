@@ -11,7 +11,8 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset --force",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test": "vitest run"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "7.9.0",
@@ -50,6 +51,7 @@
     "prisma": "7.9.0",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.0.0"
   }
 }
