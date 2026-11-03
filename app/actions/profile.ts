@@ -7,7 +7,7 @@ import { profileSchema } from "@/lib/validation";
 import { getFieldErrors, type FormState } from "@/lib/form";
 import type { ActionResult } from "@/app/actions/clashes";
 
-const MAX_AVATAR_LENGTH = 1_500_000; // ~1.1 MB decoded
+const MAX_AVATAR_LENGTH = 8_000_000; // ~6 MB decoded
 const AVATAR_PATTERN = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/;
 
 export async function updateProfile(
