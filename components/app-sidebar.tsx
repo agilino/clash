@@ -4,8 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Map as MapIcon,
   Zap,
+  Building2,
   CalendarCheck,
+  Ticket,
+  Store,
 } from "lucide-react";
 import {
   Sidebar,
@@ -25,11 +29,15 @@ import { NavUser } from "@/components/nav-user";
 
 const mainNav = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { title: "Map", href: "/map", icon: MapIcon },
   { title: "Clashes", href: "/clashes", icon: Zap },
+  { title: "Venues", href: "/venues", icon: Building2 },
 ];
 
 const personalNav = [
   { title: "My Clashes", href: "/my-clashes", icon: CalendarCheck },
+  { title: "My Participations", href: "/participations", icon: Ticket },
+  { title: "My Venues", href: "/my-venues", icon: Store },
 ];
 
 function isActive(pathname: string, href: string): boolean {
