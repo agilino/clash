@@ -1,7 +1,4 @@
-// CLASH MCP server, the starter on CLASH's 19-start. One tool works already:
-// list_upcoming_clashes. Task 19 adds find_venue (step 2), create_clash (step 3)
-// and cancel_clash (step 4).
-// The finished server is mcp/server.ts on CLASH's 19-solution.
+// CLASH MCP server: four tools over the CLASH database, spoken over stdio.
 // Start it with: npx tsx mcp/server.ts   (Claude Code does this via .mcp.json)
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -45,7 +42,6 @@ function isIsoDateTime(value: string) {
 
 const server = new McpServer({ name: "clash", version: "1.0.0" });
 
-// The model tool: a name, a description the model reads, a zod schema, a function.
 server.registerTool(
   "list_upcoming_clashes",
   {
@@ -78,11 +74,97 @@ server.registerTool(
   },
 );
 
-// Step 2 of task 19: register find_venue here.
+server.registerTool(
+  "find_venue",
+  {
+    description: "Find venues whose title contains the query (case does not matter). At most 5.",
+    inputSchema: z.object({ query: z.string().min(1) }),
+  },
+  async ({ query }) => {
+    const venues = await prisma.venue.findMany({
+      where: { title: { contains: query } },
+      orderBy: { title: "asc" },
+      take: 5,
+      select: { id: true, title: true, latitude: true, longitude: true },
+    });
+    if (venues.length === 0) return reply(`No venue matches "${query}".`);
+    return reply(JSON.stringify(venues, null, 2));
+  },
+);
 
-// Step 3 of task 19: register create_clash here.
+server.registerTool(
+  "create_clash",
+  {
+    description:
+      "Create a clash at a known venue, hosted by an existing CLASH user. " +
+      "Refuses unknown hosts, unknown venues, past or invalid dates, and duplicates.",
+    inputSchema: z.object({
+      title: z.string().min(1),
+      description: z.string(),
+      dateTime: z.string().describe("ISO date-time in the future"),
+      venueId: z.string().describe("id from find_venue"),
+      hostEmail: z.string().describe("email of the CLASH user who hosts the clash"),
+    }),
+  },
+  async ({ title, description, dateTime, venueId, hostEmail }) => {
+    const host = await prisma.user.findUnique({ where: { email: hostEmail } });
+    if (!host) return refuse(`No CLASH user with email ${hostEmail}. Nothing was created.`);
 
-// Step 4 of task 19: register cancel_clash here.
+    const venue = await prisma.venue.findUnique({ where: { id: venueId } });
+    if (!venue) return refuse(`Unknown venue ${venueId}. Use find_venue to get a valid id.`);
+
+    const when = new Date(dateTime);
+    if (!isIsoDateTime(dateTime) || Number.isNaN(when.getTime()) || when <= new Date()) {
+      return refuse("dateTime must be an ISO date-time in the future.");
+    }
+
+    const duplicate = await prisma.clash.findFirst({ where: { title, dateTime: when } });
+    if (duplicate) {
+      return refuse(`Duplicate: "${title}" already exists at ${when.toISOString()} (id ${duplicate.id}).`);
+    }
+
+    const clash = await prisma.clash.create({
+      data: {
+        title,
+        description,
+        dateTime: when,
+        latitude: venue.latitude,
+        longitude: venue.longitude,
+        venueId: venue.id,
+        creatorId: host.id,
+      },
+    });
+    log(`created clash ${clash.id}`);
+    return reply(`Created clash ${clash.id}: "${clash.title}" at ${clash.dateTime.toISOString()}.`);
+  },
+);
+
+server.registerTool(
+  "cancel_clash",
+  {
+    description:
+      "Cancel a clash: delete it from CLASH. Only the CLASH user who created the clash can cancel it.",
+    inputSchema: z.object({
+      clashId: z.string().describe("id from create_clash or list_upcoming_clashes"),
+      hostEmail: z.string().describe("email of the CLASH user who created the clash"),
+    }),
+  },
+  async ({ clashId, hostEmail }) => {
+    const host = await prisma.user.findUnique({ where: { email: hostEmail } });
+    if (!host) return refuse(`No CLASH user with email ${hostEmail}. Nothing was deleted.`);
+
+    const clash = await prisma.clash.findUnique({ where: { id: clashId } });
+    if (!clash) return refuse(`Unknown clash ${clashId}. Use list_upcoming_clashes to find it.`);
+
+    if (clash.creatorId !== host.id) {
+      return refuse(`${hostEmail} did not create clash ${clashId}. Nothing was deleted.`);
+    }
+
+    await prisma.clash.delete({ where: { id: clash.id } });
+    log(`cancelled clash ${clash.id}`);
+    return reply(`Cancelled clash ${clash.id}: "${clash.title}".`);
+  },
+);
 
 async function main() {
   await server.connect(new StdioServerTransport());
