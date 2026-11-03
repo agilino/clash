@@ -139,6 +139,9 @@ export async function deleteClash(id: string): Promise<ActionResult> {
     select: { creatorId: true },
   });
   if (!clash) return { ok: false, error: "Clash not found." };
+  if (clash.creatorId !== user.id) {
+    return { ok: false, error: "You can only delete clashes you created." };
+  }
 
   await prisma.clash.delete({ where: { id } });
   revalidateClashViews(id);
