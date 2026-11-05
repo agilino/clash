@@ -1,0 +1,47 @@
+Clash: Proprietary Licence
+
+Copyright (c) 2026 Pawel Sawicki. All rights reserved.
+
+This software, including its source code, documentation, designs, seed data
+and all associated files (the "Software"), is the property of Pawel Sawicki.
+All rights not expressly granted in this licence are reserved.
+
+1. PERMITTED USE
+   You may download, install, run, study and modify the Software solely for
+   your own private, non-commercial purposes. Any copies or modified versions
+   must remain private and must keep this licence and the copyright notice
+   above.
+
+2. PROHIBITED USE
+   Without prior written consent from Pawel Sawicki, you may NOT:
+   a) use the Software, or any part or derivative of it, for any commercial
+      purpose. This includes paid products or services, consulting or client
+      work, and use by or on behalf of a company or other organisation;
+   b) use, present, teach or demonstrate the Software, or any part or
+      derivative of it, in any public setting. This includes workshops,
+      trainings, courses, conferences, meetups, talks, webinars and live
+      streams, whether free or paid;
+   c) publish, redistribute, sublicense, sell, rent or host the Software, or
+      any part or derivative of it, or otherwise make it available to third
+      parties, including as a publicly accessible website or service.
+
+3. WRITTEN CONSENT
+   Any use beyond Section 1 requires prior written consent from Pawel Sawicki.
+   Contact: Pawel Sawicki, pawel.sawicki@tunetrain.ai
+
+4. THIRD-PARTY COMPONENTS
+   Third-party libraries and files used by or included in the Software (for
+   example npm dependencies, and vendored files that carry their own licence,
+   such as .agents/skills/frontend-design/LICENSE.txt) remain under their
+   respective licences.
+
+5. TERMINATION
+   Any use in breach of this licence automatically ends your permission to
+   use the Software.
+
+6. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT
+   OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
