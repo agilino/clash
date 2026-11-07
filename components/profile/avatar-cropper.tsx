@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const OUTPUT_SIZE = 256;
+const OUTPUT_SIZE = 1024;
 
 async function getCroppedDataUrl(
   imageSrc: string,
@@ -47,7 +47,7 @@ async function getCroppedDataUrl(
     OUTPUT_SIZE,
   );
 
-  return canvas.toDataURL("image/jpeg", 0.85);
+  return canvas.toDataURL();
 }
 
 export function AvatarCropper({ hasAvatar }: { hasAvatar: boolean }) {
