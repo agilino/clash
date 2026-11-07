@@ -94,6 +94,9 @@ export async function deleteVenue(id: string): Promise<ActionResult> {
     select: { creatorId: true },
   });
   if (!venue) return { ok: false, error: "Venue not found." };
+  if (venue.creatorId !== user.id) {
+    return { ok: false, error: "You can only delete venues you created." };
+  }
 
   // Clashes referencing this venue keep their coordinates (venueId set null).
   await prisma.venue.delete({ where: { id } });
