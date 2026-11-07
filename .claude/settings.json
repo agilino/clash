@@ -70,5 +70,11 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "mcp__clash__find_venue",
+      "mcp__clash__list_upcoming_clashes"
+    ]
   }
 }
